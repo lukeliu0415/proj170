@@ -15,7 +15,8 @@ def solve(G, s):
     """
 
     # TODO: your code here!
-    pass
+    
+    for 
 
 
 # Here's an example of how to run your solver.
