@@ -64,4 +64,3 @@ def n_generator(num_vertices, filename):
         n = text_file.write(curr_line)
 
     text_file.close()
-
