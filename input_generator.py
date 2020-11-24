@@ -20,7 +20,7 @@ def graph_generator(num_vertices):
 
     return G
 
-write_input_file(graph_generator(10), 40, '10.in')
+write_input_file(graph_generator(10), 40, 'input_10.in')
 
 def n_generator(num_vertices, filename):
     text_file = open(filename, "wt")
@@ -33,4 +33,3 @@ def n_generator(num_vertices, filename):
         n = text_file.write(curr_line)
 
     text_file.close()
-
