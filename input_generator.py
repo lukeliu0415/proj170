@@ -2,6 +2,7 @@ import networkx as nx
 from random import seed
 from random import random
 from parse import write_input_file, write_output_file
+from utils import calculate_stress_for_room
 
 def graph_generator(num_vertices):
     G = nx.Graph()
@@ -60,7 +61,7 @@ def generate_cluster(G, cluster_size, v_start, ratio, room_stress):
     print(sum(edge_stress))
     k = 0
     for i in range(v_start, v_start + cluster_size):
-        for j in range(v_start + i+1, v_start + cluster_size):
+        for j in range(i + 1, v_start + cluster_size):
             # generate stress such that 
             curr_stress = edge_stress[k]
             k += 1
@@ -68,6 +69,8 @@ def generate_cluster(G, cluster_size, v_start, ratio, room_stress):
             random_ratio = ratio - random() * 0.2
             curr_happiness = curr_stress * random_ratio
             G.add_edge(i, j, happiness = round(curr_happiness, 3), stress = round(curr_stress, 3))
+            print("?????")
+    print("Stress for room: " + str(calculate_stress_for_room([v_start + i for i in range(cluster_size)], G)))
 
 def generate_deceiving_edges(G, u, v, ratio):
     curr_stress = random() * 2
@@ -96,8 +99,8 @@ def graph_generator_easier(num_vertices, ratio, clusters_sizes, starting_nodes, 
             if not G.has_edge(i, j):
                 low_stress = random() * 2 + 3
                 low_happiness = random() * 1
-                G.add_edge(i, j, happiness = round(low_happiness, 3), stress = round(low_stress, 3))
-                # G.add_edge(i, j, happiness=0, stress=50)
+                # G.add_edge(i, j, happiness = round(low_happiness, 3), stress = round(low_stress, 3))
+                G.add_edge(i, j, happiness=0, stress=50)
 
     # stress_budget = max(cluster_stress) * len(clusters_sizes)
     return G
