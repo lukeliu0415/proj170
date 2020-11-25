@@ -14,78 +14,61 @@ def solve(G, s):
         k: Number of breakout rooms
     """
 
-    # TODO: your code here!
     vertex_list = list(G.nodes)
     N = len(vertex_list)
 
-    solution_list = []
-    happiness_list = []
-
-    # result_k = 0
-    k = 1
-    while (k < N):
-        # Keep track of the best solution 
-        # best_happiness_so_far = 0
-        solution = {}   # key:value => (vertex, room)
-        total_stress_left = 0
-        room_to_vertices = {}      # key:value => (room number, vertices)
+    # iterate through all possible values of number of rooms
+    for k in range(1, N+1):
+        solution = {}  # key:value => (vertex, room)
+        room_to_vertices = {}  # key:value => (room number, vertices)
 
         # Assume all vertices are on their own 
         for i in range(len(vertex_list)):
             solution[i] = i
             room_to_vertices[i] = [i]
         
-        # print(type(G.edges))
-        edges = sorted(G.edges(data=True), key=lambda t: t[2].get('happiness', 0)/t[2].get('stress', 1), reverse = True)
-        # print(edges)    
-        for e in edges: 
-            # temp_solution = {} 
-            # temp_happiness = 0
-            v = e[0]
-            u = e[1]
-            curr_stress = e[2].get('stress', 0)
-            
-            # try to make the best choice 
+        edges = sorted(G.edges(data=True), key=lambda e: e[2].get('happiness') / e[2].get('stress'), reverse = True)
+        # edges = sorted(G.edges(data=True), key=lambda t: t[2].get('happiness'), reverse = True) # sort by highest happiness
+
+        for e in edges:
+            # get current room numbers
             room_v = solution[e[0]]
             room_u = solution[e[1]]
+
+            # see if the pair is already in the same room
             if room_u == room_v:
                 continue
             
-            #attempt merge room
+            # attempt to merge room
             merged_room = room_to_vertices[room_v] + room_to_vertices[room_u]   
             room_num = len(room_to_vertices) - 1   
 
-            #see if it satisfy stress constraints
+            # if it does not satisfy stress constraints, abort
             if calculate_stress_for_room(merged_room, G) > s / k:
                 continue
             
-            # actually merge 
+            # actually merge
             for v in room_to_vertices[room_u]:
                 solution[v] = room_v
             room_to_vertices[room_v] = merged_room
             room_to_vertices.pop(room_u)
 
-            # check to see if we should update 
-            # calculate_happiness(solution, G)
+        # print(calculate_happiness(solution, G))
+
+        # check to see if we should update if the constraint on the # of rooms is satisfied; if so, return the result
         if len(room_to_vertices) <= k:
-            result = solution
-            break
-        # if temp_happines > best_happiness_so_far:
-        #     best_solution_so_far = temp_solution
+            result = {}
+            length = len(room_to_vertices)
 
-        # if is_valid_solution(solution, G, s, k):
-        #     result = solution
-        #     result_k = k
-        #     break
-        k += 1
-
-    return result, k
+            for i in range(length):
+                vertices = room_to_vertices.pop(list(room_to_vertices.keys())[0])
+                for v in vertices:
+                    result[v] = i
+            return result, length
 
 
 # Here's an example of how to run your solver.
-
 # Usage: python3 solver.py test.in
-
 if __name__ == '__main__':
     assert len(sys.argv) == 2
     path = sys.argv[1]
@@ -97,8 +80,8 @@ if __name__ == '__main__':
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
     # write_output_file(D, 'out/test.out')
 
-    # D_staff = read_output_file("samples/10.out", G, s)
-    # print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
+    D_staff = read_output_file("samples/10.out", G, s)
+    print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
