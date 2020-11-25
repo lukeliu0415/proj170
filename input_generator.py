@@ -1,7 +1,7 @@
 import networkx as nx
 from random import seed
 from random import random
-from parse import write_input_file
+from parse import write_input_file, write_output_file
 
 def graph_generator(num_vertices):
     G = nx.Graph()
@@ -46,22 +46,91 @@ def new_graph_generator(num_vertices):
     for i in range(num_vertices):
         for j in range(i+1, num_vertices):
             if not G.has_edge(i, j):
-                G.add_edge(i, j, happiness=round(random() * 6 + 3, 3), stress=round(random() * 4.5 + 4.5, 3))
-
-    G.add_edge(0, 9, happiness=15.329, stress=7.552)
+                G.add_edge(i, j, happiness=round(random(), 3), stress=round(random() * 5 + 5, 3))
+                # G.add_edge(i, j, happiness=0, stress=50)
 
     return G
 
-write_input_file(new_graph_generator(10), 60, '10.in')
+def generate_cluster(G, cluster_size, v_start, ratio, room_stress): 
+    total_edges = int((cluster_size * (cluster_size - 1)) / 2)
+    edge_stress = [random() for i in range(total_edges)]
+    stress_sum = sum(edge_stress)
+    edge_stress = [(x * (room_stress + random() * -0.1)) / stress_sum for x in edge_stress] 
+    print(edge_stress)
+    print(sum(edge_stress))
+    k = 0
+    for i in range(v_start, v_start + cluster_size):
+        for j in range(v_start + i+1, v_start + cluster_size):
+            # generate stress such that 
+            curr_stress = edge_stress[k]
+            k += 1
+            # generate random ratio less than the defining ratio
+            random_ratio = ratio - random() * 0.2
+            curr_happiness = curr_stress * random_ratio
+            G.add_edge(i, j, happiness = round(curr_happiness, 3), stress = round(curr_stress, 3))
 
-def n_generator(num_vertices, filename):
-    text_file = open(filename, "wt")
-    n = text_file.write(str(num_vertices) + "\n")
-    n = text_file.write(str(round(random()* 50 + 30), 3) + "\n")
+def generate_deceiving_edges(G, u, v, ratio):
+    curr_stress = random() * 2
+    random_ratio_greater = random() * 0.2 + ratio
+    # print(ratio)
+    # print(random_ratio_greater)
+    curr_happiness = curr_stress * random_ratio_greater
+    G.add_edge(u, v, happiness = round(curr_happiness, 3), stress = round(curr_stress, 3))
+
+def graph_generator_easier(num_vertices, ratio, clusters_sizes, starting_nodes, stress_budget):
+    G = nx.Graph()
+    G.add_nodes_from(range(num_vertices))
+
+    # generate the clusters 
+    for i in range(len(clusters_sizes)):
+        generate_cluster(G, clusters_sizes[i], starting_nodes[i], ratio, stress_budget/len(clusters_sizes))
+    
+    # generate deceiving connection between clusters
+    for i in range(1, len(starting_nodes)):
+        generate_deceiving_edges(G, starting_nodes[i] - 1, starting_nodes[i], ratio)
+    generate_deceiving_edges(G, starting_nodes[0], num_vertices - 1, ratio)
+
+    # generate other not as effective edges 
     for i in range(num_vertices):
-        curr_line = ""
-        for j in range(i + 1, num_vertices):
-            curr_line += str(i) + " " + str(j) + " " + str(round(random() * 100, 3)) + " " + str(round(random() * 100, 3)) + "\n"
-        n = text_file.write(curr_line)
+        for j in range(i+1, num_vertices):
+            if not G.has_edge(i, j):
+                low_stress = random() * 2 + 3
+                low_happiness = random() * 1
+                G.add_edge(i, j, happiness = round(low_happiness, 3), stress = round(low_stress, 3))
+                # G.add_edge(i, j, happiness=0, stress=50)
 
-    text_file.close()
+    # stress_budget = max(cluster_stress) * len(clusters_sizes)
+    return G
+
+def generate_optimal_graph(clusters_sizes):
+    result = {}
+    counter = 0
+    for i in range(len(clusters_sizes)):
+        for j in range(clusters_sizes[i]):  
+            result[counter] = i
+            counter += 1
+    return result
+
+#[0, 5, 9, 13, 17]
+graph_20 = graph_generator_easier(20, 3, clusters_sizes = [3, 3, 3, 4, 4, 3], starting_nodes = [0, 3, 6, 9, 13, 17], stress_budget = 90)
+graph_20_out = generate_optimal_graph([3, 3, 3, 4, 4, 3])
+
+write_input_file(graph_20, 90,'20.in')
+write_output_file(graph_20_out, '20.out')
+
+# graph_50, budget_50 = graph_generator_easier(50)
+# write_input_file(graph_50, '50.in')
+
+# write_input_file(new_graph_generator(10), 60, '10.in')
+
+# def n_generator(num_vertices, filename):
+#     text_file = open(filename, "wt")
+#     n = text_file.write(str(num_vertices) + "\n")
+#     n = text_file.write(str(round(random()* 50 + 30), 3) + "\n")
+#     for i in range(num_vertices):
+#         curr_line = ""
+#         for j in range(i + 1, num_vertices):
+#             curr_line += str(i) + " " + str(j) + " " + str(round(random() * 100, 3)) + " " + str(round(random() * 100, 3)) + "\n"
+#         n = text_file.write(curr_line)
+
+#     text_file.close()
