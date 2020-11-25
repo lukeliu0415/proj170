@@ -23,32 +23,32 @@ def graph_generator(num_vertices):
 def new_graph_generator(num_vertices):
     G = nx.Graph()
     G.add_nodes_from(range(num_vertices))
-    G.add_edge(0, 1, happiness=11, stress=6)
-    G.add_edge(0, 2, happiness=13, stress=7)
-    G.add_edge(1, 2, happiness=13, stress=7)
 
-    G.add_edge(2, 3, happiness=15.1, stress=7.5)
+    G.add_edge(0, 1, happiness=11.329, stress=6.342)
+    G.add_edge(0, 2, happiness=12.239, stress=6.495)
+    G.add_edge(1, 2, happiness=13.947, stress=7.135)
 
-    G.add_edge(3, 4, happiness=9, stress=5)
-    G.add_edge(3, 5, happiness=15, stress=8)
-    G.add_edge(4, 5, happiness=13, stress=7)
+    G.add_edge(2, 3, happiness=15.143, stress=7.524)
 
-    G.add_edge(5, 6, happiness=15.1, stress=7.5)
+    G.add_edge(3, 4, happiness=9.837, stress=5.259)
+    G.add_edge(3, 5, happiness=15.23, stress=7.784)
+    G.add_edge(4, 5, happiness=13.429, stress=6.95)
 
-    G.add_edge(6, 7, happiness=7, stress=4)
-    G.add_edge(6, 8, happiness=5, stress=3)
-    G.add_edge(6, 9, happiness=9, stress=5)
-    G.add_edge(7, 8, happiness=9, stress=5)
-    G.add_edge(7, 9, happiness=1, stress=1)
-    G.add_edge(8, 9, happiness=3, stress=2)
+    G.add_edge(5, 6, happiness=15.259, stress=7.557)
 
-    G.add_edge(9, 0, happiness=15.1, stress=7.5)
+    G.add_edge(6, 7, happiness=7.294, stress=4.253)
+    G.add_edge(6, 8, happiness=5.275, stress=3.293)
+    G.add_edge(6, 9, happiness=9.582, stress=4.135)
+    G.add_edge(7, 8, happiness=9.204, stress=5.034)
+    G.add_edge(7, 9, happiness=1.9, stress=1.023)
+    G.add_edge(8, 9, happiness=4.125, stress=2.234)
 
     for i in range(num_vertices):
         for j in range(i+1, num_vertices):
             if not G.has_edge(i, j):
-                # G.add_edge(i, j, happiness=round(random(), 3), stress=round(random() * 5 + 5, 3))
-                G.add_edge(i, j, happiness=0, stress=50)
+                G.add_edge(i, j, happiness=round(random() * 6 + 3, 3), stress=round(random() * 4.5 + 4.5, 3))
+
+    G.add_edge(0, 9, happiness=15.329, stress=7.552)
 
     return G
 

@@ -80,8 +80,8 @@ if __name__ == '__main__':
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
     # write_output_file(D, 'out/test.out')
 
-    D_staff = read_output_file("samples/10.out", G, s)
-    print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
+    D_optimal = read_output_file("10.out", G, s)
+    print("Optimal Happiness: {}".format(calculate_happiness(D_optimal, G)))
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
