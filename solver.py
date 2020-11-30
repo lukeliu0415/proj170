@@ -85,7 +85,7 @@ if __name__ == '__main__':
     print(D)
     print(k)
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-#     write_output_file(D, 'out/test.out')
+#     write_output_file(D, 'outputs/test.out')
 
 #     D_staff = read_output_file(path+".out", G, s)
 #     print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
@@ -96,8 +96,8 @@ if __name__ == '__main__':
 #     inputs = glob.glob('inputs/*')
 #     for input_path in inputs:
 #         output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
-#         G, s = read_input_file(input_path, 100)
+#         G, s = read_input_file(input_path)
 #         D, k = solve(G, s)
 #         assert is_valid_solution(D, G, s, k)
-#         cost_t = calculate_happiness(D, G)
+#         happiness = calculate_happiness(D, G)
 #         write_output_file(D, output_path)
