@@ -2,7 +2,14 @@ import networkx as nx
 from parse import read_input_file, write_output_file, read_output_file
 from utils import is_valid_solution, calculate_happiness, calculate_stress_for_room
 import sys
+import glob
+from os.path import basename, normpath
 
+def sortOrder(e):
+    if e[2].get('stress') == 0:
+        return e[2].get('happiness') / 0.001
+    else:
+        return e[2].get('happiness') / e[2].get('stress')
 
 def solve(G, s):
     """
@@ -27,7 +34,7 @@ def solve(G, s):
             solution[i] = i
             room_to_vertices[i] = [i]
         
-        edges = sorted(G.edges(data=True), key=lambda e: e[2].get('happiness') / e[2].get('stress'), reverse = True)
+        edges = sorted(G.edges(data=True), key = sortOrder, reverse = True)
         # edges = sorted(G.edges(data=True), key=lambda t: t[2].get('happiness'), reverse = True) # sort by highest happiness
 
         for e in edges:
@@ -78,19 +85,19 @@ if __name__ == '__main__':
     print(D)
     print(k)
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-    write_output_file(D, 'out/test.out')
+#     write_output_file(D, 'out/test.out')
 
-    D_staff = read_output_file(path+".out", G, s)
-    print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
+#     D_staff = read_output_file(path+".out", G, s)
+#     print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 # if __name__ == '__main__':
-#     inputs = glob.glob('file_path/inputs/*')
+#     inputs = glob.glob('inputs/small/*')
 #     for input_path in inputs:
-#         output_path = 'file_path/outputs/' + basename(normpath(input_path))[:-3] + '.out'
+#         output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
 #         G, s = read_input_file(input_path, 100)
 #         D, k = solve(G, s)
 #         assert is_valid_solution(D, G, s, k)
-#         cost_t = calculate_happiness(T)
+#         cost_t = calculate_happiness(D, G)
 #         write_output_file(D, output_path)
