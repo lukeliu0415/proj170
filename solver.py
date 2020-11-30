@@ -2,8 +2,8 @@ import networkx as nx
 from parse import read_input_file, write_output_file, read_output_file
 from utils import is_valid_solution, calculate_happiness, calculate_stress_for_room
 import sys
-import glob
 from os.path import basename, normpath
+import glob
 
 def sortOrder(e):
     if e[2].get('stress') == 0:
