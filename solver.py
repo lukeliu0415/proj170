@@ -1,9 +1,25 @@
 import networkx as nx
 from parse import read_input_file, write_output_file, read_output_file
-from utils import is_valid_solution, calculate_happiness, calculate_stress_for_room
+from utils import is_valid_solution, calculate_happiness, calculate_stress_for_room, calculate_happiness_for_room
 import sys
 from os.path import basename, normpath
 import glob
+from random import random, randint, choice
+import itertools
+import copy
+
+def partition(collection):
+    if len(collection) == 1:
+        yield [ collection ]
+        return
+
+    first = collection[0]
+    for smaller in partition(collection[1:]):
+        # insert `first` in each of the subpartition's subsets
+        for n, subset in enumerate(smaller):
+            yield smaller[:n] + [[ first ] + subset]  + smaller[n+1:]
+        # put `first` in its own subset 
+        yield [ [ first ] ] + smaller
 
 def sortOrder(e):
     if e[2].get('stress') == 0:
@@ -11,16 +27,39 @@ def sortOrder(e):
     else:
         return e[2].get('happiness') / e[2].get('stress')
 
-def solve(G, s):
-    """
-    Args:
-        G: networkx.Graph
-        s: stress_budget
-    Returns:
-        D: Dictionary mapping for student to breakout room r e.g. {0:2, 1:0, 2:1, 3:2}
-        k: Number of breakout rooms
-    """
+def solve_naive(G, s):
+    vertex_list = list(G.nodes)
+    N = len(vertex_list)
 
+    best_happiness = 0
+    config = {}
+    numRooms = 0
+
+    for n, p in enumerate(partition(list(range(10))), 1):
+        print(n)
+        isValid = True
+        for room in p:
+            if calculate_stress_for_room(room, G) > s / len(p):
+                isValid = False
+                break
+
+        if not isValid:
+            continue
+        
+        D = {}
+        for i in range(len(p)):
+            for j in p[i]:
+                D[j] = i
+
+        happiness = calculate_happiness(D, G)
+        if happiness > best_happiness:
+            best_happiness = happiness
+            config = D
+            numRooms = len(p)
+
+    return config, numRooms
+
+def solve_greedy(G, s):
     vertex_list = list(G.nodes)
     N = len(vertex_list)
 
@@ -47,8 +86,7 @@ def solve(G, s):
                 continue
             
             # attempt to merge room
-            merged_room = room_to_vertices[room_v] + room_to_vertices[room_u]   
-            room_num = len(room_to_vertices) - 1   
+            merged_room = room_to_vertices[room_v] + room_to_vertices[room_u] 
 
             # if it does not satisfy stress constraints, abort
             if calculate_stress_for_room(merged_room, G) > s / k:
@@ -73,14 +111,71 @@ def solve(G, s):
                     result[v] = i
             return result, length
 
+def findsubsets(s):
+    subsets = []
+    for i in range(2, len(s) + 1):
+        subsets.extend(list(itertools.combinations(s, i)))
+    return subsets
+
+def solve(G, s):
+    """
+    Args:
+        G: networkx.Graph
+        s: stress_budget
+    Returns:
+        D: Dictionary mapping for student to breakout room r e.g. {0:2, 1:0, 2:1, 3:2}
+        k: Number of breakout rooms
+    """
+    N = len(G.nodes())
+
+    # another idea: get the best edges for each person, and iterate through some of them to connect together
+    for k in range(3, N+1):
+        G_copy = copy.deepcopy(G)
+        i = 0  # room counter
+        solution = {}  # key:value => (vertex, room)
+        while True:
+            if i == k:
+                break
+            v = choice(list(G_copy.nodes()))
+            
+            edges = sorted(G_copy.edges(v, data = True), key = sortOrder, reverse = True)
+            subsets = findsubsets(edges[:10])
+
+            best_merged_room = [v]
+            largest_happiness = 0
+            for subset in subsets:
+                merged_room = [v]
+                for e in subset:
+                    merged_room.append(e[1])
+                
+                # if it does not satisfy stress constraints, abort
+                if calculate_stress_for_room(merged_room, G) > s / k:
+                    continue
+
+                happiness = calculate_happiness_for_room(merged_room, G)
+                if happiness > largest_happiness:
+                    largest_happiness = happiness
+                    best_merged_room = merged_room
+            
+            for v in best_merged_room:
+                solution[v] = i
+            i += 1
+            G_copy.remove_nodes_from(best_merged_room)
+
+            if not G_copy.nodes():
+                return solution, i
+
 
 # Here's an example of how to run your solver.
 # Usage: python3 solver.py test.in
 if __name__ == '__main__':
-    assert len(sys.argv) == 2
+    # assert len(sys.argv) == 2
     path = sys.argv[1]
     G, s = read_input_file(path + ".in")
-    D, k = solve(G, s)
+    if len(sys.argv) > 2 and sys.argv[2] == "g":
+        D, k = solve_greedy(G, s)
+    else:
+        D, k = solve(G, s)
     assert is_valid_solution(D, G, s, k)
     print(D)
     print(k)
