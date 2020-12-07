@@ -136,16 +136,24 @@ def solve(G, s):
             if i == k:
                 break
             v = choice(list(G_copy.nodes()))
-            
-            edges = sorted(G_copy.edges(v, data = True), key = sortOrder, reverse = True)
-            subsets = findsubsets(edges[:10])
+
+            best_ratios = sorted(G_copy.edges(v, data = True), key = sortOrder, reverse = True)[:5]
+            highest_happiness = sorted(G_copy.edges(v, data=True), key=lambda t: t[2].get('happiness'), reverse = True)[:5]
+            lowest_stress = sorted(G_copy.edges(v, data=True), key=lambda t: t[2].get('stress'))[:5]
+
+            best_ratios_vertices = set([i[1] for i in best_ratios])
+            highest_happiness_vertices = set([i[1] for i in highest_happiness])
+            lowest_stress_vertices = set([i[1] for i in best_ratios])
+
+            vertices = best_ratios_vertices.union(highest_happiness_vertices).union(lowest_stress_vertices)
+            subsets = findsubsets(vertices)
 
             best_merged_room = [v]
             largest_happiness = 0
             for subset in subsets:
                 merged_room = [v]
-                for e in subset:
-                    merged_room.append(e[1])
+                for vertex in subset:
+                    merged_room.append(vertex)
                 
                 # if it does not satisfy stress constraints, abort
                 if calculate_stress_for_room(merged_room, G) > s / k:
