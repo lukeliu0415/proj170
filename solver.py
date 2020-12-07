@@ -128,7 +128,7 @@ def solve(G, s):
     N = len(G.nodes())
 
     # another idea: get the best edges for each person, and iterate through some of them to connect together
-    for k in range(3, N+1):
+    for k in range(5, N+1):
         G_copy = copy.deepcopy(G)
         i = 0  # room counter
         solution = {}  # key:value => (vertex, room)
@@ -195,7 +195,7 @@ def solve(G, s):
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/medium-*')
+    inputs = glob.glob('inputs/large-*')
     for input_path in inputs:
         output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
         G, s = read_input_file(input_path)
