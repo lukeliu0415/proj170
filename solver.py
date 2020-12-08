@@ -290,8 +290,10 @@ def repeatedly_solve(path):
             
     # print(solutions)
     # print(max(solutions))
-
-repeatedly_solve("medium-120")
+bad_files = [14, 20, 28, 36, 37, 40, 41, 42, 47, 49, 52, 53, 58, 61, 62, 63, 64, 65, 68, 69, 70]
+for file in bad_files:
+    print(file)
+    repeatedly_solve("medium-" + str(file))
     
 
 # Here's an example of how to run your solver.
