@@ -249,31 +249,48 @@ def solve_helper(G, s, ratio_num, happiness_num, stress_num):
 def repeatedly_solve(path):
     G, s = read_input_file("inputs/" + path + ".in")
     solutions = []
+    happiness = []
     for i in range(5):
         D, k = solve_helper(G, s, 12, 0, 0)
         assert is_valid_solution(D, G, s, k)
-        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
-        solutions.append(calculate_happiness(D, G))
+        # write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
+        solutions.append(D)
+        happiness.append(calculate_happiness(D, G))
+    print("i'm done with 5 only ratio")
     for i in range(5):
         D, k = solve_helper(G, s, 0, 12, 0)
         assert is_valid_solution(D, G, s, k)
-        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
-        solutions.append(calculate_happiness(D, G))
+        # write_output_file(D, "outputs_manual/" + str(path) + "_happiness_" + str(i) + ".out")
+        solutions.append(D)
+        happiness.append(calculate_happiness(D, G))
+    print("i'm done with 5 only happiness")
     for i in range(5):
         D, k = solve_helper(G, s, 0, 0, 12)
         assert is_valid_solution(D, G, s, k)
-        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
-        solutions.append(calculate_happiness(D, G))
+        # write_output_file(D, "outputs_manual/" + str(path) + "_stress_" + str(i) + ".out")
+        solutions.append(D)
+        happiness.append(calculate_happiness(D, G))
+    print("i'm done with 5 only stress")
     for i in range(5):
         D, k = solve_helper(G, s, 5, 5, 5)
         assert is_valid_solution(D, G, s, k)
-        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
-        solutions.append(calculate_happiness(D, G))
-    
-    print(solutions)
-    print(max(solutions))
+        # write_output_file(D, "outputs_manual/" + str(path) + "_all_3_" + str(i) + ".out")
+        solutions.append(D)
+        happiness.append(calculate_happiness(D, G))
+    print("i'm done with 5 all 3")
+    print(happiness)
+    max_happiness = max(happiness)
+    best_index = 0
+    for i in range(20):
+        if happiness[i] == max_happiness:
+            best_index = i
+    print(best_index)
+    write_output_file(solutions[best_index], "out_manual/" + str(path) + ".out")
+            
+    # print(solutions)
+    # print(max(solutions))
 
-repeatedly_solve("medium-171")
+repeatedly_solve("medium-120")
     
 
 # Here's an example of how to run your solver.
