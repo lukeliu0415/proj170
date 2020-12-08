@@ -112,7 +112,7 @@ def solve_greedy(G, s):
 
 def findsubsets(s):
     subsets = []
-    for i in range(2, len(s) + 1):
+    for i in range(1, len(s) + 1):
         subsets.extend(list(itertools.combinations(s, i)))
     return subsets
 
@@ -137,13 +137,19 @@ def solve(G, s):
                 break
             v = choice(list(G_copy.nodes()))
 
+            # if len(G_copy.nodes()) == 1:
+            #     v = list(G_copy.nodes())[0]
+            # else:
+            #     edges = sorted(G_copy.edges(data=True), key = sortOrder, reverse = True)
+            #     v = edges[0][0]
+
             best_ratios = sorted(G_copy.edges(v, data = True), key = sortOrder, reverse = True)[:5]
             highest_happiness = sorted(G_copy.edges(v, data=True), key=lambda t: t[2].get('happiness'), reverse = True)[:5]
             lowest_stress = sorted(G_copy.edges(v, data=True), key=lambda t: t[2].get('stress'))[:5]
 
             best_ratios_vertices = set([i[1] for i in best_ratios])
             highest_happiness_vertices = set([i[1] for i in highest_happiness])
-            lowest_stress_vertices = set([i[1] for i in best_ratios])
+            lowest_stress_vertices = set([i[1] for i in lowest_stress])
 
             vertices = best_ratios_vertices.union(highest_happiness_vertices).union(lowest_stress_vertices)
             subsets = findsubsets(vertices)
