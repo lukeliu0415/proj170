@@ -35,13 +35,13 @@ def solve_naive(G, s):
     config = {}
     numRooms = 0
 
-    for n, p in enumerate(partition(list(range(10))), 1):
+    for n, p in enumerate(partition(list(range(20))), 1):
         isValid = True
         for room in p:
             if calculate_stress_for_room(room, G) > s / len(p):
                 isValid = False
                 break
-
+        print(n)
         if not isValid:
             continue
         
@@ -178,6 +178,103 @@ def solve(G, s):
             if not G_copy.nodes():
                 return solution, i
 
+def solve_helper(G, s, ratio_num, happiness_num, stress_num):
+    """
+    Args:
+        G: networkx.Graph
+        s: stress_budget
+    Returns:
+        D: Dictionary mapping for student to breakout room r e.g. {0:2, 1:0, 2:1, 3:2}
+        k: Number of breakout rooms
+    """
+    N = len(G.nodes())
+
+    # another idea: get the best edges for each person, and iterate through some of them to connect together
+    for k in range(5, N+1):
+        G_copy = copy.deepcopy(G)
+        i = 0  # room counter
+        solution = {}  # key:value => (vertex, room)
+        while True:
+            if i == k:
+                break
+            v = choice(list(G_copy.nodes()))
+
+            # if len(G_copy.nodes()) == 1:
+            #     v = list(G_copy.nodes())[0]
+            # else:
+            #     edges = sorted(G_copy.edges(data=True), key = sortOrder, reverse = True)
+            #     v = edges[0][0]
+
+            best_ratios = sorted(G_copy.edges(v, data = True), key = sortOrder, reverse = True)[:ratio_num]
+            highest_happiness = sorted(G_copy.edges(v, data=True), key=lambda t: t[2].get('happiness'), reverse = True)[:happiness_num]
+            lowest_stress = sorted(G_copy.edges(v, data=True), key=lambda t: t[2].get('stress'))[:stress_num]
+
+            # best_ratios_vertices = []
+            # highest_happiness_vertices = []
+            # lowest_stress_vertices = []
+            # if len(best_ratios) != 0:
+            best_ratios_vertices = set([i[1] for i in best_ratios])
+            # if len(highest_happiness) != 0:
+            highest_happiness_vertices = set([i[1] for i in highest_happiness])
+            # if len(lowest_stress) != 0:
+            lowest_stress_vertices = set([i[1] for i in lowest_stress])
+
+            vertices = best_ratios_vertices.union(highest_happiness_vertices).union(lowest_stress_vertices)
+            subsets = findsubsets(vertices)
+
+            best_merged_room = [v]
+            largest_happiness = 0
+            for subset in subsets:
+                merged_room = [v]
+                for vertex in subset:
+                    merged_room.append(vertex)
+                
+                # if it does not satisfy stress constraints, abort
+                if calculate_stress_for_room(merged_room, G) > s / k:
+                    continue
+
+                happiness = calculate_happiness_for_room(merged_room, G)
+                if happiness > largest_happiness:
+                    largest_happiness = happiness
+                    best_merged_room = merged_room
+            
+            for v in best_merged_room:
+                solution[v] = i
+            i += 1
+            G_copy.remove_nodes_from(best_merged_room)
+
+            if not G_copy.nodes():
+                return solution, i
+
+def repeatedly_solve(path):
+    G, s = read_input_file("inputs/" + path + ".in")
+    solutions = []
+    for i in range(5):
+        D, k = solve_helper(G, s, 12, 0, 0)
+        assert is_valid_solution(D, G, s, k)
+        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
+        solutions.append(calculate_happiness(D, G))
+    for i in range(5):
+        D, k = solve_helper(G, s, 0, 12, 0)
+        assert is_valid_solution(D, G, s, k)
+        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
+        solutions.append(calculate_happiness(D, G))
+    for i in range(5):
+        D, k = solve_helper(G, s, 0, 0, 12)
+        assert is_valid_solution(D, G, s, k)
+        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
+        solutions.append(calculate_happiness(D, G))
+    for i in range(5):
+        D, k = solve_helper(G, s, 5, 5, 5)
+        assert is_valid_solution(D, G, s, k)
+        write_output_file(D, "outputs_manual/" + str(path) + "_ratio_" + str(i) + ".out")
+        solutions.append(calculate_happiness(D, G))
+    
+    print(solutions)
+    print(max(solutions))
+
+repeatedly_solve("medium-171")
+    
 
 # Here's an example of how to run your solver.
 # Usage: python3 solver.py test.in
@@ -200,13 +297,15 @@ def solve(G, s):
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
-if __name__ == '__main__':
-    inputs = glob.glob('inputs/large-5*')
-    for input_path in inputs:
-        output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
-        G, s = read_input_file(input_path)
-        D, k = solve(G, s)
-        assert is_valid_solution(D, G, s, k)
-        happiness = calculate_happiness(D, G)
-        write_output_file(D, output_path)
-        print(input_path)
+# if __name__ == '__main__':
+#     inputs = glob.glob('inputs/medium-232.in')
+#     for input_path in inputs:
+#         output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
+#         G, s = read_input_file(input_path)
+#         D, k = solve_naive(G, s)
+#         assert is_valid_solution(D, G, s, k)
+#         happiness = calculate_happiness(D, G)
+#         print(happiness)
+#         print(D)
+#         write_output_file(D, output_path)
+#         print(input_path)
