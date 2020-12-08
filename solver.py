@@ -292,8 +292,8 @@ repeatedly_solve("medium-171")
 #     print("Total Happiness: {}".format(calculate_happiness(D, G)))
 #     write_output_file(D, 'outputs/test.out')
 
-#     D_staff = read_output_file(path+".out", G, s)
-#     print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
+    # D_staff = read_output_file(path+".out", G, s)
+    # print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
