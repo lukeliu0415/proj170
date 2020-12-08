@@ -281,6 +281,7 @@ def repeatedly_solve(path):
     print(happiness)
     max_happiness = max(happiness)
     best_index = 0
+    print(max_happiness)
     for i in range(20):
         if happiness[i] == max_happiness:
             best_index = i
