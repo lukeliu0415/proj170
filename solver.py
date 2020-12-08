@@ -195,13 +195,17 @@ def solve(G, s):
 #     print("Total Happiness: {}".format(calculate_happiness(D, G)))
 #     write_output_file(D, 'outputs/test.out')
 
-#     D_staff = read_output_file(path+".out", G, s)
-#     print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
+    # D_staff = read_output_file(path+".out", G, s)
+    # print("Staff Happiness: {}".format(calculate_happiness(D_staff, G)))
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/large-*')
+<<<<<<< HEAD
+    inputs = glob.glob('inputs/large-19*')
+=======
+    inputs = glob.glob('inputs/large-5*')
+>>>>>>> 8250cfbe26e2af7d2a56238e6df4376bdc726b74
     for input_path in inputs:
         output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
         G, s = read_input_file(input_path)
